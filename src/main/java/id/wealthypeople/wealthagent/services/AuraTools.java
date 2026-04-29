@@ -14,7 +14,6 @@ public class AuraTools {
             double expectedAnnualReturnRate,
             String riskProfile
     ) {
-        // 🔥 MAGIC HAPPENS HERE 🔥
         // Saat user meminta simulasi, AI akan memanggil method ini secara otomatis.
         // Kita mencetak output dalam format JSON murni agar mudah ditangkap oleh fetch() di Next.js
         

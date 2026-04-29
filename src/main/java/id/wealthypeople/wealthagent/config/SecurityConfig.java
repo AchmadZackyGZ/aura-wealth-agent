@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Biarkan preflight CORS lewat
                 // SANGAT PENTING: Gabungkan jalur /api/chat dan /api/auth di sini
                 .requestMatchers("/api/chat/**", "/api/auth/**").permitAll() 
+                .requestMatchers("/api/chat/**", "/api/auth/**", "/api/market/**").permitAll()
                 .anyRequest().authenticated() // Sisanya wajib gembok
             );
 
