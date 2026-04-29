@@ -21,7 +21,7 @@ langchain4j:
   open-ai:
     chat-model:
       base-url: https://openrouter.ai/api/v1
-      api-key: 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
-      model-name: google/gemini-2.5-flash:free
+      api-key: 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
+      model-name: openrouter/free
       temperature: 0.7
       max-tokens: 2000
