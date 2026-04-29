@@ -1,0 +1,27 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    # URL Supabase (Menggunakan Pooler port 6543)
+    url: jdbc:postgresql://aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres?sslmode=require
+    username: postgres.gvylodnmwcbwrbmdmwvy
+    password: (123Zacky123)
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # Akan otomatis membuat/update tabel di Supabase
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Konfigurasi AI Agent (OpenRouter)
+langchain4j:
+  open-ai:
+    chat-model:
+      base-url: https://openrouter.ai/api/v1
+      api-key: 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
+      model-name: google/gemini-2.5-flash:free
+      temperature: 0.7
+      max-tokens: 2000
