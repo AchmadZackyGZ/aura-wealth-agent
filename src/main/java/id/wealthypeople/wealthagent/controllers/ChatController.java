@@ -2,12 +2,14 @@ package id.wealthypeople.wealthagent.controllers;
 
 import id.wealthypeople.wealthagent.dtos.ApiResponse;
 import id.wealthypeople.wealthagent.dtos.ChatRequest;
-import id.wealthypeople.wealthagent.dtos.ChatResponse;
+import id.wealthypeople.wealthagent.dtos.SimulationResult;
 import id.wealthypeople.wealthagent.services.AuraAgent;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -21,25 +23,26 @@ public class ChatController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ChatResponse>> chat(@RequestBody ChatRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> chat(@RequestBody ChatRequest request) {
         
-        // 1. Cek apakah ini chat baru atau lanjutan dari sesi sebelumnya
         UUID currentSessionId = request.getSessionId();
         if (currentSessionId == null) {
-            currentSessionId = UUID.randomUUID(); // Buat ID sesi baru
+            currentSessionId = UUID.randomUUID(); 
         }
 
-        // 2. Tembak pesan ke AI Agent (Aura)
-        String aiReply = auraAgent.chat(currentSessionId, request.getMessage());
+        // 1. Tembak ke AI. LangChain4j akan memaksa AI mengembalikan Object SimulationResult!
+        SimulationResult aiResult = auraAgent.chat(currentSessionId, request.getMessage());
 
-        // 3. Siapkan objek balasan (Session ID & Teks/JSON dari AI)
-        ChatResponse chatResponse = new ChatResponse(currentSessionId, aiReply);
+        // 2. Kita bungkus sessionId dan hasil JSON AI ke dalam satu Map
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("sessionId", currentSessionId);
+        responseData.put("reply", aiResult); // "reply" sekarang berisi Object JSON, BUKAN teks panjang!
 
-        // 4. Bungkus menggunakan ApiResponse agar formatnya seragam dengan GlobalExceptionHandler
-        ApiResponse<ChatResponse> response = ApiResponse.<ChatResponse>builder()
+        // 3. Kembalikan ke Frontend
+        ApiResponse<Map<String, Object>> response = ApiResponse.<Map<String, Object>>builder()
                 .status(HttpStatus.OK.value())
-                .message("Berhasil mendapatkan respons dari Aura")
-                .data(chatResponse)
+                .message("Berhasil mendapatkan respons grafik dari Aura")
+                .data(responseData)
                 .build();
 
         return ResponseEntity.ok(response);

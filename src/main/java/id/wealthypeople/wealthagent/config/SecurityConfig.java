@@ -21,12 +21,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Aktifkan CORS global
-            .csrf(AbstractHttpConfigurer::disable) // Wajib dimatikan untuk REST API
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Biarkan preflight CORS lewat
-                .requestMatchers("/api/chat/**").permitAll() // Bebaskan endpoint AI Chat
+                // SANGAT PENTING: Gabungkan jalur /api/chat dan /api/auth di sini
+                .requestMatchers("/api/chat/**", "/api/auth/**").permitAll() 
                 .anyRequest().authenticated() // Sisanya wajib gembok
             );
 
@@ -36,14 +37,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Izinkan tembakan dari Next.js lokal
         configuration.setAllowedOrigins(List.of("http://localhost:3000")); 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // Terapkan aturan CORS ini ke seluruh endpoint API
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
